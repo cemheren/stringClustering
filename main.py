@@ -1,12 +1,13 @@
 from __future__ import print_function
-import numpy as np
 import pickle
-import pandas as pd
 import json
-from WordsToNumbers import *
-import matplotlib.pyplot as plt
 import codecs
+import sys
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
+from WordsToNumbers import *
 from sklearn.metrics import silhouette_score
 from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -42,6 +43,7 @@ print("vectorizing...")
 tfidf_vectorizer = TfidfVectorizer(max_df=0.001, max_features=200000,
                                  min_df=0.0001, tokenizer=split_words_in_text,
                                  use_idf=True, ngram_range=(1, 3))
+                                 
 
 tfidf_matrix = tfidf_vectorizer.fit_transform(names)  # fit the vectorizer to synopses
 
@@ -58,8 +60,8 @@ for c in range(30, 31):
     km = KMeans(n_clusters=num_clusters)
     km.fit(tfidf_matrix)
     clusters = km.labels_.tolist()
-    ss = silhouette_score(tfidf_matrix, km.labels_, metric='euclidean')
-    print("silhouette_score: , num_clusters:", ss, num_clusters)
+    # ss = silhouette_score(tfidf_matrix, km.labels_, metric='euclidean')
+    # print("silhouette_score: , num_clusters:", ss, num_clusters)
 
 # uncomment the below to save your model
 # since I've already run my model I am loading from the pickle
@@ -75,7 +77,11 @@ order_centroids = km.cluster_centers_.argsort()[:, ::-1]
 groups = frame.groupby('cluster')
 
 for name, group in groups:
-    raw_input("Press Enter to continue...")
+    if sys.version_info > (2,9):
+        input("Press Enter to continue...")
+    else:
+        raw_input("Press Enter to continue...")
+
     print(len(group.values))
     print(group.values)
 
