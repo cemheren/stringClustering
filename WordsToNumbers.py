@@ -55,7 +55,7 @@ def sentence_to_word_array(sentence="", remove_punctuation=True, to_lowercase=Tr
             if should_camel_case_split:
                 inferred = camel_case_split(word.lower())
                 for i in inferred:
-                    if len(i) > 1 and not i.lower() in return_array:
+                    if len(i) > 2 and not i.lower() in return_array:
                         return_array.append(i.lower())
 
             if remove_punctuation:
@@ -64,7 +64,7 @@ def sentence_to_word_array(sentence="", remove_punctuation=True, to_lowercase=Tr
             if should_infer_spaces:
                 inferred = infer_spaces(word.lower())
                 for i in inferred:
-                    if len(i) > 1 and not i.lower() in return_array:
+                    if len(i) > 2 and not i.lower() in return_array:
                         return_array.append(i.lower())
 
             if len(word) > 0 and not i.lower() in return_array:

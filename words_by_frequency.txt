@@ -125556,3 +125556,4 @@ wcus
 ubuntu
 cloud
 prod
+solr

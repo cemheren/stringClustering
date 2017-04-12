@@ -3,6 +3,8 @@ import pickle
 import json
 import codecs
 import sys
+import operator
+import argparse
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -31,17 +33,47 @@ def split_words_in_text(text):
 # graph = json.load(graph)
 # names = [n['Name'] for n in graph]
 
+parser = argparse.ArgumentParser(description='Cluster a text file with a list of strings')
+parser.add_argument('filename', metavar='FILENAME',
+                    help='File name with extention that contains the list of strings')
+
+parser.add_argument('--maxC', dest='maxC', type=float, default=0.3,
+                    help='add a max commonality parameter for the vectorizer. (default: 0.3). Larger commonality groups things into bigger/more generic clusters')
+
+parser.add_argument('--minC', dest='minC', type=float, default=0.001,
+                    help='add a min commonality parameter for the vectorizer. (default: 0.001). Larger commonality eliminates more noise, but may miss some specific clusters.')
+
+parser.add_argument('--clusters', dest='clusterCount', type=int, default=50,
+                    help='Number of clusters to create (default: 50)')
+
+parser.add_argument('--out', dest='outputfile', default="a.out", help='output file name')
+
+args = parser.parse_args()
+
+filename = args.filename
+max_commonality = args.maxC
+min_commonality = args.minC
+num_clusters = args.clusterCount
+output_file_name = args.outputfile
+output_file = {}
+
+results = {}
+
+if output_file_name:
+    output_file = open(output_file_name, 'w')
+
 names = []
-infile = codecs.open('omsProd.txt', encoding='utf-8')
+infile = codecs.open(filename, encoding='utf-8')
 for line in infile:
     names.append(line.strip())
 infile.close()
 
 # names_split = [(split_words_in_text(n)) for n in names]
+# print(names_split)
 
 print("vectorizing...")
-tfidf_vectorizer = TfidfVectorizer(max_df=0.001, max_features=200000,
-                                 min_df=0.0001, tokenizer=split_words_in_text,
+tfidf_vectorizer = TfidfVectorizer(max_df=max_commonality, max_features=200000,
+                                 min_df=min_commonality, tokenizer=split_words_in_text,
                                  use_idf=True, ngram_range=(1, 3))
                                  
 
@@ -50,18 +82,29 @@ tfidf_matrix = tfidf_vectorizer.fit_transform(names)  # fit the vectorizer to sy
 print(tfidf_matrix.shape)
 
 terms = tfidf_vectorizer.get_feature_names()
-# print(terms)
+if output_file:
+    results["terms_used_to_cluster"] = terms
+print(terms)
+print()
+print()
+
+tfidf_vectorizer2 = TfidfVectorizer(max_df=0.9999, max_features=200000,
+                                 min_df=max_commonality, tokenizer=split_words_in_text,
+                                 use_idf=True, ngram_range=(1, 3))
+
+tfidf_matrix2 = tfidf_vectorizer2.fit_transform(names)  # fit the vectorizer to synopses
+excluded_terms = tfidf_vectorizer2.get_feature_names()
+if output_file:
+    results["excluded_terms"] = excluded_terms
+print(excluded_terms)
+print()
+print()
 
 dist = 1 - cosine_similarity(tfidf_matrix)
 
-print("clustering...")
-for c in range(30, 31):
-    num_clusters = c
-    km = KMeans(n_clusters=num_clusters)
-    km.fit(tfidf_matrix)
-    clusters = km.labels_.tolist()
-    # ss = silhouette_score(tfidf_matrix, km.labels_, metric='euclidean')
-    # print("silhouette_score: , num_clusters:", ss, num_clusters)
+km = KMeans(n_clusters=num_clusters)
+km.fit(tfidf_matrix)
+clusters = km.labels_.tolist()
 
 # uncomment the below to save your model
 # since I've already run my model I am loading from the pickle
@@ -76,13 +119,51 @@ order_centroids = km.cluster_centers_.argsort()[:, ::-1]
 
 groups = frame.groupby('cluster')
 
+clusters = []
+all_tags = dict()
 for name, group in groups:
-    if sys.version_info > (2,9):
-        input("Press Enter to continue...")
-    else:
-        raw_input("Press Enter to continue...")
 
-    print(len(group.values))
-    print(group.values)
+    result_group = {}
+    values = group.values[:,1]
+    tags = dict()
+    for v in values:
+        split_value = split_words_in_text(v)
+        for sv in split_value:
+            if sv in tags:
+                tags[sv] = tags[sv] + 1
+            else:
+                if sv not in excluded_terms and len(sv) > 1:
+                    tags[sv] = 1
 
-a = 5
+    sorted_tags = reversed(sorted(tags.items(), key=operator.itemgetter(1)))
+    important_tags = list()
+    threshold = 2
+
+    i = 0
+    for t in sorted_tags:
+        i += 1
+        important_tags.append(t[0])
+        if i > threshold:
+            break
+
+    for tag in important_tags:
+        if tag in all_tags:
+            all_tags[tag].extend(values)
+        else:
+            all_tags[tag] = list()
+            all_tags[tag].extend(values)
+
+    print(len(values))
+    print(values)
+    if output_file:
+        result_group["values"] = list(values)
+
+    clusters.append(result_group)
+print("----------------------------------------------------------")
+
+results["clusters"] = clusters
+
+print(all_tags.keys())
+if output_file:
+    results["tags"] = all_tags
+    output_file.write(json.dumps(results))
