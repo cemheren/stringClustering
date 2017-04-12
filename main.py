@@ -10,8 +10,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from WordsToNumbers import *
+from GMeans import GMeans
 from sklearn.metrics import silhouette_score
-from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.externals import joblib
@@ -43,9 +43,6 @@ parser.add_argument('--maxC', dest='maxC', type=float, default=0.3,
 parser.add_argument('--minC', dest='minC', type=float, default=0.001,
                     help='add a min commonality parameter for the vectorizer. (default: 0.001). Larger commonality eliminates more noise, but may miss some specific clusters.')
 
-parser.add_argument('--clusters', dest='clusterCount', type=int, default=50,
-                    help='Number of clusters to create (default: 50)')
-
 parser.add_argument('--out', dest='outputfile', default="a.out", help='output file name')
 
 args = parser.parse_args()
@@ -53,7 +50,6 @@ args = parser.parse_args()
 filename = args.filename
 max_commonality = args.maxC
 min_commonality = args.minC
-num_clusters = args.clusterCount
 output_file_name = args.outputfile
 output_file = {}
 
@@ -68,7 +64,7 @@ for line in infile:
     names.append(line.strip())
 infile.close()
 
-# names_split = [(split_words_in_text(n)) for n in names]
+names_split = [(split_words_in_text(n)) for n in names]
 # print(names_split)
 
 print("vectorizing...")
@@ -88,34 +84,36 @@ print(terms)
 print()
 print()
 
-tfidf_vectorizer2 = TfidfVectorizer(max_df=0.9999, max_features=200000,
-                                 min_df=max_commonality, tokenizer=split_words_in_text,
-                                 use_idf=True, ngram_range=(1, 3))
+excluded_terms = []
 
-tfidf_matrix2 = tfidf_vectorizer2.fit_transform(names)  # fit the vectorizer to synopses
-excluded_terms = tfidf_vectorizer2.get_feature_names()
-if output_file:
-    results["excluded_terms"] = excluded_terms
-print(excluded_terms)
-print()
-print()
+try:
+    tfidf_vectorizer2 = TfidfVectorizer(max_df=0.9999, max_features=200000,
+                                    min_df=max_commonality, tokenizer=split_words_in_text,
+                                    use_idf=True, ngram_range=(1, 3))
+
+    tfidf_matrix2 = tfidf_vectorizer2.fit_transform(names)  # fit the vectorizer to synopses
+    excluded_terms = tfidf_vectorizer2.get_feature_names()
+    if output_file:
+        results["excluded_terms"] = excluded_terms
+    print(excluded_terms)
+    print()
+    print()
+except: 
+     z = 5
 
 dist = 1 - cosine_similarity(tfidf_matrix)
 
-km = KMeans(n_clusters=num_clusters)
-km.fit(tfidf_matrix)
-clusters = km.labels_.tolist()
+gmeans = GMeans(random_state=1010,
+		strictness=4)
+gmeans.fit(tfidf_matrix)
 
-# uncomment the below to save your model
-# since I've already run my model I am loading from the pickle
-# joblib.dump(km,  'doc_cluster.pkl')
-# km = joblib.load('doc_cluster.pkl')
+clusters = gmeans.labels_
 
-names = {'names': names, 'cluster': clusters}
-frame = pd.DataFrame(names, index=[clusters])
+pandas_helper = {'names': names, 'cluster': clusters}
+frame = pd.DataFrame(pandas_helper, index=[clusters])
 
 frame['cluster'].value_counts()
-order_centroids = km.cluster_centers_.argsort()[:, ::-1]
+# order_centroids = km.cluster_centers_.argsort()[:, ::-1]
 
 groups = frame.groupby('cluster')
 
@@ -135,35 +133,52 @@ for name, group in groups:
                 if sv not in excluded_terms and len(sv) > 1:
                     tags[sv] = 1
 
-    sorted_tags = reversed(sorted(tags.items(), key=operator.itemgetter(1)))
+    sorted_tags = list(reversed(sorted(tags.items(), key=operator.itemgetter(1))))
     important_tags = list()
-    threshold = 2
+    threshold = 10
 
     i = 0
     for t in sorted_tags:
         i += 1
-        important_tags.append(t[0])
+        if t[1] >= 1: #(len(values) / 2):
+            important_tags.append(t[0])
         if i > threshold:
             break
 
     for tag in important_tags:
         if tag in all_tags:
-            all_tags[tag].extend(values)
+            # all_tags[tag].extend(values)
+            a = 5
         else:
             all_tags[tag] = list()
-            all_tags[tag].extend(values)
+            # all_tags[tag].extend(values)
 
     print(len(values))
     print(values)
     if output_file:
         result_group["values"] = list(values)
+        result_group["tags"] = sorted_tags
 
     clusters.append(result_group)
 print("----------------------------------------------------------")
 
 results["clusters"] = clusters
 
-print(all_tags.keys())
+i = 0
+for name_list in names_split:
+    for tag in all_tags:
+        if tag in name_list:
+            all_tags[tag].append(names[i])
+
+    i += 1
+
+return_tags = dict()
+for tag in all_tags.keys():
+    if len(all_tags[tag]) > 1:
+        return_tags[tag] = all_tags[tag]
+
+print(return_tags.keys())
+
 if output_file:
-    results["tags"] = all_tags
+    results["tags"] = return_tags
     output_file.write(json.dumps(results))
