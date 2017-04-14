@@ -45,10 +45,6 @@ parser.add_argument('--maxC', dest='maxC', type=float, default=0.3,
 parser.add_argument('--minC', dest='minC', type=float, default=0.001,
                     help='add a min commonality parameter for the vectorizer. (default: 0.001). Larger commonality eliminates more noise, but may miss some specific clusters.')
 
-parser.add_argument('--noeng', dest='noenglish', action='store_const',
-                    const=sum,
-                    help='option to disable English dictionary and use contextual dictionary')
-
 parser.add_argument('--namemode', dest='namemode', action='store_const',
                     const=sum,
                     help='just output the most popular tag')
@@ -77,7 +73,7 @@ parser.add_argument('--verbose', dest='verbose', action='store_const',
 
 parser.add_argument('--dry', dest='dry', action='store_const',
                     const=sum,
-                    help='Verbose output')
+                    help='dry run. Doesnt produce an output file.')
 
 args = parser.parse_args()
 
