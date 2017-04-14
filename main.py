@@ -53,6 +53,9 @@ parser.add_argument('--namemode', dest='namemode', action='store_const',
                     const=sum,
                     help='just output the most popular tag')
 
+parser.add_argument('--tagmode', dest='tagmode',type=int, default=-1,
+                    help='just output the most popular tags')
+
 parser.add_argument('--ngram', dest='ngram', type=int, default=1,
                     help='number of tokens to take into account when calculating the distance matrix. Pick a larger number if your data is diverse')
 
@@ -88,6 +91,7 @@ ngram_number = args.ngram
 max_features = args.maxfeatures
 kmeans_cluster_count = args.clusterCount
 namemode = args.namemode
+tagmode = args.tagmode
 dry_run = args.dry
 
 top_level_excluded_terms = ["aa", "oi"]
@@ -96,6 +100,7 @@ files = []
 
 if os.path.isdir(fileordirname):
     files = [join(fileordirname, f) for f in listdir(fileordirname) if isfile(join(fileordirname, f))]
+    files = [f for f in files if not output_file_ext in f]
 else:
     files.append(fileordirname)
 
@@ -194,8 +199,6 @@ for filename in files:
         sorted_tags = list(reversed(sorted(tags.items(), key=operator.itemgetter(1))))
         important_tags = list()
         threshold = 10
-        if tag_reduce:
-            threshold = 2
 
         i = 0
         for t in sorted_tags:
@@ -300,6 +303,19 @@ for filename in files:
                     del return_tags[t]
 
             results["tags"] = return_tags
+
+            top_count = 5
+            if tagmode != -1:
+                top_count = tagmode
+
+            if len(return_tags) < 5:
+                top_count = len(return_tags)
+
+            results["top_tags"] = OrderedDict(sorted(return_tags.items(), key=lambda x: len(x[1]), reverse=True)[:top_count]) 
+
+            if tagmode != -1 or verbose:
+                top_tag_list = [t for t in results["top_tags"].keys()]
+                print(" ".join(top_tag_list))
 
         if not dry_run:
             output_file.write(json.dumps(results))

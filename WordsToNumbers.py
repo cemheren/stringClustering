@@ -67,7 +67,7 @@ def sentence_to_word_array(sentence="", remove_punctuation=True, to_lowercase=Tr
                     if len(i) > 2 and not i.lower() in return_array:
                         return_array.append(i.lower())
 
-            if len(word) > 0 and not i.lower() in return_array:
+            if len(word) > 1 and not i.lower() in return_array:
                 return_array.append(word.lower())
 
     return return_array

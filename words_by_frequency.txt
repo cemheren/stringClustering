@@ -565,7 +565,6 @@ study
 official
 italian
 run
-k
 village
 ice
 working
@@ -650,7 +649,6 @@ our
 reason
 event
 goes
-v
 ocean
 blood
 hit
@@ -3215,6 +3213,8 @@ derby
 root
 notice
 ligue
+krutav
+lahari
 lewis
 canal
 statistics
@@ -4807,7 +4807,6 @@ stuck
 archbishop
 dwarf
 corn
-ta
 shoulder
 dome
 robin
@@ -6894,7 +6893,6 @@ bonus
 cornish
 eccentricity
 choosing
-chi
 burton
 inuyasha
 forbes
@@ -11823,7 +11821,6 @@ zebra
 unicode
 afrikaans
 jul
-ut
 pistol
 militant
 gardening
@@ -11898,7 +11895,6 @@ rupert
 gc
 daddy
 daxter
-kr
 tended
 ndez
 functionality
@@ -16776,8 +16772,8 @@ ladders
 disqualification
 silvery
 motive
-sauropods
 spoon
+sauropods
 banded
 hansen
 lindstr
@@ -17478,8 +17474,6 @@ prolific
 illuminated
 cainozoic
 persisted
-ru
-ro
 incorporate
 reruns
 owing
@@ -27968,7 +27962,6 @@ scorers
 fretboard
 prue
 sterilization
-av
 chisel
 rockhampton
 wegener
@@ -28902,7 +28895,6 @@ garret
 ashanti
 myriapods
 leandro
-lahar
 norgay
 sultans
 buildup
@@ -31379,7 +31371,6 @@ eneco
 nkrumah
 sunnyland
 osten
-uta
 durant
 naturalistic
 plainchant
@@ -35736,7 +35727,6 @@ maclean
 woodblock
 menezes
 clipper
-kru
 fiordiligi
 pjc
 centripetal
@@ -53242,7 +53232,6 @@ corinne
 volunteering
 vnv
 whims
-chira
 matapan
 shingon
 hdmi
@@ -85259,7 +85248,6 @@ rup
 cardington
 uncritical
 semitestacea
-rut
 conegliano
 listpadding
 fuca

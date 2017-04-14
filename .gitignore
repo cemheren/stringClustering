@@ -7,3 +7,5 @@ main.spec
 *.out
 ResourceNames.Prod
 *.cls
+paresh-data/ResourceNames.EUS.Prod.latest
+paresh-data/ResourceNames.Prod.latest
