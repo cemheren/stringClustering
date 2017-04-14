@@ -6,3 +6,4 @@ main.spec
 *.txt
 *.out
 ResourceNames.Prod
+*.cls

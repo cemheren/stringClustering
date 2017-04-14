@@ -43,7 +43,7 @@ def infer_spaces(s):
     return reversed(out)
 
 
-def sentence_to_word_array(sentence="", remove_punctuation=True, to_lowercase=True, should_infer_spaces=False, should_camel_case_split=False):
+def sentence_to_word_array(sentence="", remove_punctuation=True, to_lowercase=True, should_infer_spaces=True, should_camel_case_split=True):
     return_array = list()
     split = list()
 
