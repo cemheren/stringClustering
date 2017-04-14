@@ -2,7 +2,7 @@
 
 A simple cluster finding and document tagging algorihm authored in python. 
 
-Gives great results for clustering relative lines in a document. 
+Gives great results for clustering similar lines in a document. 
 
 Uses https://github.com/flylo/g-means for auto clustering with GMeans.
 
