@@ -104,7 +104,7 @@ for filename in files:
         names.append(line.strip())
     infile.close()
 
-    results = process_strings(names)
+    results = process_strings(names, verbose, max_commonality, min_commonality, max_features, ngram_number, kmeans_cluster_count, tag_reduce, namemode, tagmode, 5)
 
     if not dry_run:
         output_file.write(json.dumps(results))
