@@ -3,7 +3,6 @@ build/
 .vscode/
 __pycache__/main.cpython-35.pyc
 main.spec
-*.txt
 *.out
 ResourceNames.Prod
 *.cls
