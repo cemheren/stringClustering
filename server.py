@@ -17,8 +17,16 @@ def cluster(strings):
 @app.route("/name/<strings>")
 def name(strings):
     names = strings.split(" ")
-    result = process_strings(names, False, 1, 0.01, 1000, 1, -1, False, True, False, 5)
+    result = process_strings(names, False, 1, 0, 1000, 1, -1, False, True, False, 5)
     return json.dumps(result)
 
+@app.route("/tags/<strings>")
+def tags(strings):
+    names = strings.split(" ")
+    result = process_strings(names, False, 1, 0, 1000, 1, -1, False, False, True, 5)
+    return json.dumps(result)
+
+
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    # app.run() # local
+    app.run(host='0.0.0.0') # cloud

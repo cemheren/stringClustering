@@ -75,21 +75,22 @@ def process_strings(names=[],
 
     excluded_terms = []
 
-    try:
-        tfidf_vectorizer2 = TfidfVectorizer(max_df=0.9999, max_features=max_features,
-                                        min_df=max_commonality, tokenizer=split_words_in_text,
-                                        use_idf=True, ngram_range=(1, ngram_number))
+    if(max_commonality < 0.9):
+        try:
+            tfidf_vectorizer2 = TfidfVectorizer(max_df=0.9999, max_features=max_features,
+                                            min_df=max_commonality, tokenizer=split_words_in_text,
+                                            use_idf=True, ngram_range=(1, ngram_number))
 
-        tfidf_matrix2 = tfidf_vectorizer2.fit_transform(names)  # fit the vectorizer to synopses
-        excluded_terms = tfidf_vectorizer2.get_feature_names()
-        results["excluded_terms"] = excluded_terms
-        
-        if verbose:
-            print(excluded_terms)
-            print()
-            print()
-    except: 
-        z = 5
+            tfidf_matrix2 = tfidf_vectorizer2.fit_transform(names)  # fit the vectorizer to synopses
+            excluded_terms = tfidf_vectorizer2.get_feature_names()
+            results["excluded_terms"] = excluded_terms
+            
+            if verbose:
+                print(excluded_terms)
+                print()
+                print()
+        except: 
+            z = 5
 
 
     if kmeans_cluster_count == -1:
