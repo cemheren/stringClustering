@@ -23,7 +23,7 @@ def name(strings):
 @app.route("/tags/<strings>")
 def tags(strings):
     names = strings.split(" ")
-    result = process_strings(names, False, 1, 0, 1000, 1, -1, False, False, True, 5)
+    result = process_strings(names, False, 0.9, 0, 1000, 1, -1, True, False, True, 30)
     return json.dumps(result)
 
 

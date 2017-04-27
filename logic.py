@@ -13,6 +13,7 @@ from os import listdir
 from os.path import isfile, join
 import matplotlib.pyplot as plt
 
+from packaging.version import Version, parse
 from collections import OrderedDict
 from WordsToNumbers import *
 from GMeans import GMeans
@@ -133,12 +134,12 @@ def process_strings(names=[],
         for t in sorted_tags:
             i += 1
 
-            if tag_reduce:
-                if t[1] >= (len(values) / 2):
-                    important_tags.append(t[0])
-            else:
-                if t[1] >= 1:
-                    important_tags.append(t[0])
+            # if tag_reduce:
+            #     if t[1] >= (len(values) / 2):
+            #         important_tags.append(t[0])
+            # else:
+            if t[1] >= 1:
+                important_tags.append(t[0])
             
             if i > threshold:
                 break
@@ -225,6 +226,13 @@ def process_strings(names=[],
                             tags_to_remove[key1] = 0
                         if set2<set1:
                             tags_to_remove[key2] = 0                           
+
+            for k in return_tags.keys():
+                try:
+                    v = Version(k)
+                    tags_to_remove[k] = 0
+                except:
+                    pass
 
             for t in tags_to_remove.keys():
                 del return_tags[t]
