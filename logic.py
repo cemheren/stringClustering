@@ -45,8 +45,7 @@ def process_strings(names=[],
         kmeans_cluster_count=-1, 
         tag_reduce=False, 
         namemode=False, 
-        tagmode=False,
-        top_tags=5):
+        tagmode=-1):
     
     results = {}
     top_level_excluded_terms = ["aa", "oi"]
