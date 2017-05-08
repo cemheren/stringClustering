@@ -1,4 +1,7 @@
+from gevent import monkey
+monkey.patch_all()
 from flask import Flask
+from gevent import wsgi
 from logic import *
 import json
 
@@ -26,7 +29,6 @@ def tags(strings):
     result = process_strings(names, False, 0.9, 0, 1000, 1, -1, True, False, 30)
     return json.dumps(result)
 
-
-if __name__ == "__main__":
-    # app.run() # local
-    app.run(host='0.0.0.0') # cloud
+# server = wsgi.WSGIServer(('127.0.0.1', 5000), app)
+server = wsgi.WSGIServer(('0.0.0.0', 5000), app)
+server.serve_forever()

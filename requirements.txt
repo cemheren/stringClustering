@@ -7,3 +7,4 @@ scipy
 seaborn
 flask
 packaging
+gevent

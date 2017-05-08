@@ -8,3 +8,4 @@ ResourceNames.Prod
 *.cls
 *.latest
 AITest.txt
+*.swp
